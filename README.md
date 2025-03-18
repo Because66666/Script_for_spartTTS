@@ -10,7 +10,7 @@ pip install gradio_client tqdm
 <br>下载之后放入/AP_BWE/checkpoint文件夹，如图所示。
 <img src="img.png" alt="示例图片" width="70%">
 <img src="img_1.png" alt="示例图片" width="70%">
-然后修改config.py的内容。<br>
+<br>然后修改config.py的内容。<br>
 在最后执行前请保证你的spart_tts后端已经启动。<br>
 最后执行
 ```commandline
