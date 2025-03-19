@@ -50,10 +50,10 @@ def read_txt(path: str, debug=False):
             if len(s2) <= 10:
                 cache += s2 + '，'
             else:
-                se2.append(cache+s2)
+                se2.append('  '+ cache+s2)
                 cache = ''
         if cache:
-            se2.append(cache.strip('，'))
+            se2.append('  '+cache.strip('，')) # 前面加空格是为了防止之后连接不太流畅。
         lines2 += se2
     files = ""
     print(f'切分为了{len(lines2)}段。')
