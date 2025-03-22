@@ -29,6 +29,7 @@ import re
 import importlib.util
 import sys
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s : %(message)s")
 
 def check_and_install(package,version):
     try:
@@ -110,7 +111,6 @@ def run_tts(
 ):
     """Perform TTS inference and save the generated audio."""
     logging.info(f"Saving audio to: {save_dir}")
-
     if prompt_text is not None:
         prompt_text = None if len(prompt_text) <= 1 else prompt_text
 
@@ -150,29 +150,41 @@ def run_tts(
                                ,cwd='./AP_BWE')
     return_code = process.wait()
     if return_code != 0:
-        logging.error("Subprocess failed with return code:", return_code)
+        logging.error(f"Subprocess failed with return code:{return_code}")
         stderr = process.stderr.read().decode('utf-8')
-        logging.error("Error:", stderr)
+        logging.error(f"Error:{stderr}")
     shutil.copy('file_list.txt',os.path.join('AP_BWE','file_list.txt'))
-    filename = '[已超分]'+datetime.now().strftime("%Y-%m-%d_%H-%M-%S")+'.wav'
-    if os.path.exists(filename):
-        os.remove(filename)
-
+    filename = '[已超分]' + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + '.wav'
+    if os.path.exists(f'./AP_BWE/{filename}'):
+        os.remove(f'./AP_BWE/{filename}')
+    logging.info('合成前检查。')
+    flag = False
+    for index in range(len(text_list)):
+        filename0 = f'./AP_BWE/output/cache_{index}.wav'
+        if os.path.exists(filename0):
+            pass
+        else:
+            logging.info(f"{filename0} does not exist.")
+            flag = True
+    if flag:
+        raise Exception('合成检查未通过。')
+    logging.info('合成检查已通过。')
     # 将视频合成在一起。存储在/[已超分].wav
     process = subprocess.Popen(
         ['ffmpeg', '-f', 'concat', '-safe', '0', '-i', 'file_list.txt', '-c', 'copy', filename],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,cwd='./AP_BWE')
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd='./AP_BWE')
     return_code = process.wait()
     save_path = ''
     if return_code != 0:
-        logging.error("Subprocess failed with return code:", return_code)
+        logging.error(f"Subprocess failed with return code:{return_code}")
         stderr = process.stderr.read().decode('utf-8')
-        logging.error("Error:", stderr)
+        logging.error(f"Error:{stderr}")
     else:
         logging.info("Subprocess completed successfully.")
         # os.startfile(filename)
         logging.info('已经完成超分音频合成。')
-        save_path = os.path.abspath('./AP_BWE/'+filename)
+        save_path = os.path.abspath('./AP_BWE/' + filename)
+
     return save_path
 
 
